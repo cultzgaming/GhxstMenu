@@ -678,37 +678,52 @@ local function enableFly()
 	local hrp = char:FindFirstChild("HumanoidRootPart")
 	local hum = char:FindFirstChildOfClass("Humanoid")
 	if not hrp or not hum then return end
-	hum.AutoRotate = false  -- prevents snapping to walk direction, no freeze
-	State.bodyVelocity = Instance.new("BodyVelocity")
-	State.bodyVelocity.Velocity = Vector3.zero
-	State.bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-	State.bodyVelocity.Parent = hrp
-	State.bodyGyro = Instance.new("BodyGyro")
-	State.bodyGyro.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
-	State.bodyGyro.D = 100
-	State.bodyGyro.CFrame = hrp.CFrame
-	State.bodyGyro.Parent = hrp
+
+	-- Zero humanoid movement so it doesn't fight the fly physics
+	hum.WalkSpeed = 0
+	hum.JumpPower = 0
+
+	-- Clean up any leftover instances first
+	if State.bodyVelocity then State.bodyVelocity:Destroy() end
+	if State.bodyGyro     then State.bodyGyro:Destroy()     end
+	if State.flyConn      then State.flyConn:Disconnect()   end
+
+	State.bodyVelocity          = Instance.new("BodyVelocity")
+	State.bodyVelocity.Velocity  = Vector3.zero
+	State.bodyVelocity.MaxForce  = Vector3.new(9e9, 9e9, 9e9)
+	State.bodyVelocity.Parent    = hrp
+
+	State.bodyGyro               = Instance.new("BodyGyro")
+	State.bodyGyro.MaxTorque     = Vector3.new(9e9, 9e9, 9e9)
+	State.bodyGyro.D             = 50
+	State.bodyGyro.P             = 1000
+	State.bodyGyro.CFrame        = hrp.CFrame
+	State.bodyGyro.Parent        = hrp
+
 	State.flyConn = RunService.Heartbeat:Connect(function()
 		if not State.flyEnabled then return end
 		local cam = workspace.CurrentCamera
 		local dir = Vector3.zero
-		if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += cam.CFrame.LookVector end
-		if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= cam.CFrame.LookVector end
-		if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= cam.CFrame.RightVector end
-		if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += cam.CFrame.RightVector end
-		if UserInputService:IsKeyDown(Enum.KeyCode.Space)     then dir += Vector3.yAxis end
-		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir -= Vector3.yAxis end
+		if UserInputService:IsKeyDown(Enum.KeyCode.W)         then dir += cam.CFrame.LookVector  end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S)         then dir -= cam.CFrame.LookVector  end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A)         then dir -= cam.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D)         then dir += cam.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space)     then dir += Vector3.yAxis          end
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir -= Vector3.yAxis          end
 		if dir.Magnitude > 0 then dir = dir.Unit end
 		State.bodyVelocity.Velocity = dir * State.flySpeed
-		State.bodyGyro.CFrame = cam.CFrame
+		State.bodyGyro.CFrame       = workspace.CurrentCamera.CFrame
 	end)
 	notify("✈️  Fly ON  [Q to toggle]")
 end
 
 local function disableFly()
 	local char = LocalPlayer.Character
-	local hum = char and char:FindFirstChildOfClass("Humanoid")
-	if hum then hum.AutoRotate = true end  -- restore normal rotation
+	local hum  = char and char:FindFirstChildOfClass("Humanoid")
+	if hum then
+		hum.WalkSpeed = State.walkSpeed
+		hum.JumpPower = 50
+	end
 	if State.flyConn      then State.flyConn:Disconnect();   State.flyConn      = nil end
 	if State.bodyVelocity then State.bodyVelocity:Destroy(); State.bodyVelocity = nil end
 	if State.bodyGyro     then State.bodyGyro:Destroy();     State.bodyGyro     = nil end
