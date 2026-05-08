@@ -673,14 +673,37 @@ end
 -- ============================================================
 
 local function enableFly()
-	if State.flyConn then State.flyConn:Disconnect(); State.flyConn = nil end
+	local char = LocalPlayer.Character
+	if not char then return end
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if not hrp or not hum then return end
 
-	State.flyConn = RunService.Heartbeat:Connect(function(dt)
-		local char = LocalPlayer.Character
-		if not char then return end
-		local hrp = char:FindFirstChild("HumanoidRootPart")
-		local hum = char:FindFirstChildOfClass("Humanoid")
-		if not hrp or not hum then return end
+	if State.bodyVelocity then State.bodyVelocity:Destroy() end
+	if State.bodyGyro     then State.bodyGyro:Destroy()     end
+	if State.flyConn      then State.flyConn:Disconnect()   end
+
+	State.bodyVelocity            = Instance.new("BodyVelocity")
+	State.bodyVelocity.Velocity   = Vector3.zero
+	State.bodyVelocity.MaxForce   = Vector3.new(1e5, 1e5, 1e5)
+	State.bodyVelocity.Parent     = hrp
+
+	State.bodyGyro                = Instance.new("BodyGyro")
+	State.bodyGyro.MaxTorque      = Vector3.new(1e5, 1e5, 1e5)
+	State.bodyGyro.D              = 100
+	State.bodyGyro.CFrame         = hrp.CFrame
+	State.bodyGyro.Parent         = hrp
+
+	State.flyConn = RunService.Heartbeat:Connect(function()
+		if not State.flyEnabled then return end
+		local char2 = LocalPlayer.Character
+		if not char2 then return end
+		local hrp2 = char2:FindFirstChild("HumanoidRootPart")
+		local hum2 = char2:FindFirstChildOfClass("Humanoid")
+		if not hrp2 or not hum2 then return end
+
+		-- Prevent gravity pulling the character down while flying
+		hum2:ChangeState(Enum.HumanoidStateType.Physics)
 
 		local cam = workspace.CurrentCamera
 		local dir = Vector3.zero
@@ -690,21 +713,14 @@ local function enableFly()
 		if UserInputService:IsKeyDown(Enum.KeyCode.D)         then dir += cam.CFrame.RightVector end
 		if UserInputService:IsKeyDown(Enum.KeyCode.Space)     then dir += Vector3.yAxis          end
 		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir -= Vector3.yAxis          end
-
-		if dir.Magnitude > 0 then
-			dir = dir.Unit
-			hrp.CFrame = hrp.CFrame + dir * State.flySpeed * dt
-		end
-
-		-- Keep humanoid from falling / fighting us
-		hum:ChangeState(Enum.HumanoidStateType.Physics)
+		if dir.Magnitude > 0 then dir = dir.Unit end
+		State.bodyVelocity.Velocity = dir * State.flySpeed
+		State.bodyGyro.CFrame       = cam.CFrame
 	end)
 	notify("✈️  Fly ON  [Q to toggle]")
 end
 
 local function disableFly()
-	if State.flyConn then State.flyConn:Disconnect(); State.flyConn = nil end
-	-- Let the humanoid take back over
 	local char = LocalPlayer.Character
 	local hum  = char and char:FindFirstChildOfClass("Humanoid")
 	if hum then
@@ -712,6 +728,9 @@ local function disableFly()
 		hum.WalkSpeed = State.walkSpeed
 		hum.JumpPower = 50
 	end
+	if State.flyConn      then State.flyConn:Disconnect();   State.flyConn      = nil end
+	if State.bodyVelocity then State.bodyVelocity:Destroy(); State.bodyVelocity = nil end
+	if State.bodyGyro     then State.bodyGyro:Destroy();     State.bodyGyro     = nil end
 	notify("✈️  Fly OFF")
 end
 
