@@ -908,10 +908,11 @@ do
 	local p = makePage("dupe")
 
 	makeSectionLabel(p, "WOOD")
-	makeListBtn(p, "🪵  Dupe Nearby Wood", "Duplicates wood within 20 studs", function()
+	makeListBtn(p, "🪵  Dupe Nearby Wood", "Duplicates & saves wood within 20 studs", function()
 		local char = LocalPlayer.Character
 		local hrp = char and char:FindFirstChild("HumanoidRootPart")
 		if not hrp then notify("❌ No character"); return end
+		local woodList = {}
 		local duped = 0
 		for _, obj in ipairs(workspace:GetDescendants()) do
 			local n = obj.Name:lower()
@@ -920,11 +921,27 @@ do
 					local clone = obj:Clone()
 					clone.Parent = workspace
 					clone.CFrame = obj.CFrame * CFrame.new(2, 0, 0)
+					table.insert(woodList, { name = clone.Name, cf = clone.CFrame })
 					duped += 1
 				end
 			end
 		end
-		notify("📋 Duped " .. duped .. " piece(s)")
+		local saveEvent = game:GetService("ReplicatedStorage"):FindFirstChild("SaveDupedWood")
+		if saveEvent and duped > 0 then
+			saveEvent:FireServer(woodList)
+			notify("📋 Duped & saved " .. duped .. " piece(s)")
+		else
+			notify("📋 Duped " .. duped .. " piece(s)")
+		end
+	end)
+	makeListBtn(p, "🔄  Load Saved Wood", "Spawns your previously saved wood", function()
+		local loadEvent = game:GetService("ReplicatedStorage"):FindFirstChild("LoadDupedWood")
+		if loadEvent then
+			loadEvent:FireServer()
+			notify("🔄 Loading saved wood...")
+		else
+			notify("❌ Server script not found!")
+		end
 	end)
 	makeListBtn(p, "📥  Pull Wood To Me", "Teleports nearby wood to you", function()
 		local char = LocalPlayer.Character
@@ -934,20 +951,24 @@ do
 		for _, obj in ipairs(workspace:GetDescendants()) do
 			local n = obj.Name:lower()
 			if obj:IsA("BasePart") and (n:find("log") or n:find("wood") or n:find("lumber")) then
-				obj.CFrame = hrp.CFrame + Vector3.new(math.random(-6,6), 2, math.random(-6,6))
-				count += 1
+				if (obj.Position - hrp.Position).Magnitude < 60 then
+					obj.CFrame = hrp.CFrame + Vector3.new(math.random(-6,6), 2, math.random(-6,6))
+					count += 1
+				end
 			end
 		end
 		notify("🪵 Pulled " .. count .. " piece(s)")
 	end)
-	makeListBtn(p, "🗑️  Clear Duped Wood", "Removes cloned objects", function()
+	makeListBtn(p, "🗑️  Clear Duped Wood", "Removes cloned objects & clears save", function()
 		local removed = 0
 		for _, obj in ipairs(workspace:GetDescendants()) do
 			if obj:IsA("BasePart") and obj.Name:lower():find("clone") then
 				obj:Destroy(); removed += 1
 			end
 		end
-		notify("🗑️ Cleared " .. removed .. " dupe(s)")
+		local clearEvent = game:GetService("ReplicatedStorage"):FindFirstChild("ClearDupedWood")
+		if clearEvent then clearEvent:FireServer() end
+		notify("🗑️ Cleared " .. removed .. " dupe(s) & wiped save")
 	end)
 
 	makeSectionLabel(p, "ITEMS")
