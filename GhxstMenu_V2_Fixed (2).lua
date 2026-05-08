@@ -73,15 +73,15 @@ local C = {
 	content    = Color3.fromRGB(18,  18,  18),
 	card       = Color3.fromRGB(24,  24,  24),
 	cardHover  = Color3.fromRGB(32,  32,  32),
-	gold       = Color3.fromRGB(212, 175, 55),
-	goldLight  = Color3.fromRGB(255, 215, 90),
-	goldDark   = Color3.fromRGB(130, 100, 20),
-	goldDim    = Color3.fromRGB(40,  32,  10),
-	goldFaint  = Color3.fromRGB(22,  18,  5),
+	gold       = Color3.fromRGB(90, 190, 255),
+	goldLight  = Color3.fromRGB(160, 220, 255),
+	goldDark   = Color3.fromRGB(40, 120, 180),
+	goldDim    = Color3.fromRGB(10, 30, 55),
+	goldFaint  = Color3.fromRGB(8, 18, 35),
 	white      = Color3.fromRGB(230, 230, 230),
-	muted      = Color3.fromRGB(110, 100, 75),
-	dim        = Color3.fromRGB(55,  50,  38),
-	divider    = Color3.fromRGB(35,  30,  15),
+	muted      = Color3.fromRGB(80, 130, 170),
+	dim        = Color3.fromRGB(35, 65, 95),
+	divider    = Color3.fromRGB(20, 40, 65),
 	red        = Color3.fromRGB(180, 50,  50),
 	green      = Color3.fromRGB(50,  160, 70),
 }
@@ -105,7 +105,7 @@ toggleBtn.BackgroundColor3 = C.sidebar
 toggleBtn.TextColor3       = C.gold
 toggleBtn.Font             = Enum.Font.GothamBold
 toggleBtn.TextSize         = 11
-toggleBtn.Text             = "👻  GHXST  [F9]"
+toggleBtn.Text             = "  GHXST"
 toggleBtn.BorderSizePixel  = 0
 toggleBtn.Parent           = gui
 Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 8)
@@ -143,8 +143,8 @@ logoFix2.Size = UDim2.new(1, 0, 0, 10); logoFix2.Position = UDim2.new(0, 0, 1, -
 logoFix2.BackgroundColor3 = C.sidebar; logoFix2.BorderSizePixel = 0
 
 -- ── Rainbow outline title ─────────────────────────────────────
-local GHXST_STR    = "Ghxst"
-local LETTER_W     = 18
+local GHXST_STR    = "GHXST"
+local LETTER_W     = 22
 local TITLE_START_X = 8
 local ghxstLetters = {}
 local ghxstStrokes = {}
@@ -178,7 +178,7 @@ local menuLabel = Instance.new("TextLabel")
 menuLabel.Size                   = UDim2.new(1, -8, 0, 20)
 menuLabel.Position               = UDim2.new(0, TITLE_START_X, 0, 34)
 menuLabel.BackgroundTransparency = 1
-menuLabel.Text                   = "Menu"
+menuLabel.Text                   = ""
 menuLabel.TextColor3             = Color3.fromRGB(230, 230, 230)
 menuLabel.Font                   = Enum.Font.GothamBlack
 menuLabel.TextSize               = 14
@@ -1098,7 +1098,7 @@ do
 		l.TextSize = 11; l.TextXAlignment = Enum.TextXAlignment.Left
 	end
 	aLine("GHXST Menu  v2.0")
-	aLine("Black & Gold Admin Panel")
+	aLine("Light Blue Admin Panel")
 	aLine("Toggle: F9  |  Fly: Q")
 end
 
