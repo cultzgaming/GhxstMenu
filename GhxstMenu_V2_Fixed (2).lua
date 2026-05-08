@@ -14,10 +14,10 @@ local RunService       = game:GetService("RunService")
 -- ============================================================
 
 local ADMIN_IDS = {
-	10920590462, -- ← Replace with your actual Roblox User ID
+	4430510222, -- ← Replace with your actual Roblox User ID
 }
 
-local TOGGLE_KEY = Enum.KeyCode.F9
+local TOGGLE_KEY = Enum.KeyCode.Insert
 
 local TELEPORT_LOCATIONS = {
 	{ name = "Spawn",     pos = Vector3.new(0,   5,   0)   },
@@ -104,7 +104,7 @@ toggleBtn.BackgroundColor3 = C.sidebar
 toggleBtn.TextColor3       = C.gold
 toggleBtn.Font             = Enum.Font.GothamBold
 toggleBtn.TextSize         = 11
-toggleBtn.Text             = "👻  GHXST  [F9]"
+toggleBtn.Text             = "👻  GHXST  [INS]"
 toggleBtn.BorderSizePixel  = 0
 toggleBtn.Parent           = gui
 Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 8)
@@ -141,77 +141,44 @@ local logoFix2 = Instance.new("Frame", logoBar)
 logoFix2.Size = UDim2.new(1, 0, 0, 10); logoFix2.Position = UDim2.new(0, 0, 1, -10)
 logoFix2.BackgroundColor3 = C.sidebar; logoFix2.BorderSizePixel = 0
 
--- ── Rainbow outline title ─────────────────────────────────────
--- "Ghxst" on top line — white text with animated rainbow UIStroke outline
--- "Menu"  below      — bubble/bold white text, no outline
-local GHXST_STR    = "Ghxst"
-local LETTER_W     = 18   -- px per character slot for "Ghxst"
-local TITLE_START_X = 8
-local ghxstLetters = {}   -- main white labels
-local ghxstStrokes = {}   -- UIStroke per letter (rainbow outline)
+-- ── "Ghxst" true bubble title ─────────────────────────────────
+-- Roblox's Cartoon font has naturally round, puffy letterforms.
+-- Layering a thick gold stroke under a white-fill label creates
+-- the classic inflated bubble-letter look.
 
-for i = 1, #GHXST_STR do
-	local ch = GHXST_STR:sub(i, i)
+-- Layer 1: gold shadow offset (gives 3-D depth)
+local ghxstShadow = Instance.new("TextLabel")
+ghxstShadow.Size                   = UDim2.new(1, 0, 1, 0)
+ghxstShadow.Position               = UDim2.new(0, 2, 0, 3)
+ghxstShadow.BackgroundTransparency = 1
+ghxstShadow.Text                   = "Ghxst"
+ghxstShadow.TextColor3             = Color3.fromRGB(130, 100, 20)  -- dark gold shadow
+ghxstShadow.Font                   = Enum.Font.Cartoon
+ghxstShadow.TextSize               = 30
+ghxstShadow.TextXAlignment         = Enum.TextXAlignment.Center
+ghxstShadow.TextYAlignment         = Enum.TextYAlignment.Center
+ghxstShadow.ZIndex                 = 3
+ghxstShadow.Parent                 = logoBar
 
-	-- White letter (foreground)
-	local lbl = Instance.new("TextLabel")
-	lbl.Size                   = UDim2.new(0, LETTER_W, 0, 30)
-	lbl.Position               = UDim2.new(0, TITLE_START_X + (i - 1) * LETTER_W, 0, 4)
-	lbl.BackgroundTransparency = 1
-	lbl.Text                   = ch
-	lbl.TextColor3             = Color3.fromRGB(255, 255, 255)
-	lbl.Font                   = Enum.Font.GothamBlack
-	lbl.TextSize               = 18
-	lbl.TextXAlignment         = Enum.TextXAlignment.Center
-	lbl.ZIndex                 = 5
-	lbl.Parent                 = logoBar
+-- Layer 2: white fill with thick gold stroke — the bubble letter itself
+local ghxstLabel = Instance.new("TextLabel")
+ghxstLabel.Size                   = UDim2.new(1, 0, 1, 0)
+ghxstLabel.Position               = UDim2.new(0, 0, 0, 0)
+ghxstLabel.BackgroundTransparency = 1
+ghxstLabel.Text                   = "Ghxst"
+ghxstLabel.TextColor3             = Color3.fromRGB(255, 255, 255)
+ghxstLabel.Font                   = Enum.Font.Cartoon
+ghxstLabel.TextSize               = 30
+ghxstLabel.TextXAlignment         = Enum.TextXAlignment.Center
+ghxstLabel.TextYAlignment         = Enum.TextYAlignment.Center
+ghxstLabel.ZIndex                 = 5
+ghxstLabel.Parent                 = logoBar
 
-	-- Rainbow UIStroke outline on each letter
-	local stroke = Instance.new("UIStroke", lbl)
-	stroke.Color     = Color3.fromRGB(255, 0, 0)
-	stroke.Thickness = 2
-	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-
-	ghxstLetters[i] = lbl
-	ghxstStrokes[i] = stroke
-end
-
--- "Menu" below in bubble writing (large bold, white, no outline)
-local menuLabel = Instance.new("TextLabel")
-menuLabel.Size                   = UDim2.new(1, -8, 0, 20)
-menuLabel.Position               = UDim2.new(0, TITLE_START_X, 0, 34)
-menuLabel.BackgroundTransparency = 1
-menuLabel.Text                   = "Menu"
-menuLabel.TextColor3             = Color3.fromRGB(230, 230, 230)
-menuLabel.Font                   = Enum.Font.GothamBlack  -- bold bubble look
-menuLabel.TextSize               = 14
-menuLabel.TextXAlignment         = Enum.TextXAlignment.Left
-menuLabel.ZIndex                 = 5
-menuLabel.Parent                 = logoBar
-
--- Subtle drop-shadow copy behind "Menu" for bubble depth
-local menuShadow = Instance.new("TextLabel")
-menuShadow.Size                   = UDim2.new(1, -8, 0, 20)
-menuShadow.Position               = UDim2.new(0, TITLE_START_X + 1, 0, 36)
-menuShadow.BackgroundTransparency = 1
-menuShadow.Text                   = "Menu"
-menuShadow.TextColor3             = Color3.fromRGB(0, 0, 0)
-menuShadow.TextTransparency       = 0.55
-menuShadow.Font                   = Enum.Font.GothamBlack
-menuShadow.TextSize               = 14
-menuShadow.TextXAlignment         = Enum.TextXAlignment.Left
-menuShadow.ZIndex                 = 4
-menuShadow.Parent                 = logoBar
-
--- Rainbow cycle — animates the UIStroke outline colour on each "Ghxst" letter
-local rainbowTime = 0
-RunService.Heartbeat:Connect(function(dt)
-	rainbowTime = rainbowTime + dt * 0.7  -- outline rainbow speed
-	for i, stroke in ipairs(ghxstStrokes) do
-		local hue = (rainbowTime + (i - 1) * 0.15) % 1
-		stroke.Color = Color3.fromHSV(hue, 1, 1)
-	end
-end)
+local ghxstStroke = Instance.new("UIStroke", ghxstLabel)
+ghxstStroke.Color           = Color3.fromRGB(212, 175, 55)  -- gold outline
+ghxstStroke.Thickness       = 4
+ghxstStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
+ghxstStroke.LineJoinMode    = Enum.LineJoinMode.Round
 
 -- ── Sidebar ───────────────────────────────────────────────────
 local sidebar = Instance.new("Frame")
@@ -1026,7 +993,7 @@ end
 do
 	local p = makePage("settings")
 	makeSectionLabel(p, "MENU")
-	makeListBtn(p, "🔑  Change Toggle Key", "Currently: F9", function()
+	makeListBtn(p, "🔑  Change Toggle Key", "Currently: Insert", function()
 		notify("🔑 Edit TOGGLE_KEY in script")
 	end)
 	makeListBtn(p, "🆔  Show User ID", "Display your Roblox User ID", function()
@@ -1054,7 +1021,7 @@ do
 	end
 	aLine("GHXST Menu  v2.0")
 	aLine("Black & Gold Admin Panel")
-	aLine("Toggle: F9")
+	aLine("Toggle: Insert")
 end
 
 -- ============================================================
