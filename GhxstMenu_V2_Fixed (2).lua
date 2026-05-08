@@ -678,7 +678,7 @@ local function enableFly()
 	local hrp = char:FindFirstChild("HumanoidRootPart")
 	local hum = char:FindFirstChildOfClass("Humanoid")
 	if not hrp or not hum then return end
-	hum.PlatformStand = true
+	hum.AutoRotate = false  -- prevents snapping to walk direction, no freeze
 	State.bodyVelocity = Instance.new("BodyVelocity")
 	State.bodyVelocity.Velocity = Vector3.zero
 	State.bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
@@ -708,7 +708,7 @@ end
 local function disableFly()
 	local char = LocalPlayer.Character
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
-	if hum then hum.PlatformStand = false end
+	if hum then hum.AutoRotate = true end  -- restore normal rotation
 	if State.flyConn      then State.flyConn:Disconnect();   State.flyConn      = nil end
 	if State.bodyVelocity then State.bodyVelocity:Destroy(); State.bodyVelocity = nil end
 	if State.bodyGyro     then State.bodyGyro:Destroy();     State.bodyGyro     = nil end
