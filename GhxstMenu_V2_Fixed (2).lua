@@ -18,6 +18,7 @@ local ADMIN_IDS = {
 }
 
 local TOGGLE_KEY = Enum.KeyCode.F9
+local FLY_KEY    = Enum.KeyCode.Q  -- ← Press Q to toggle fly instantly
 
 local TELEPORT_LOCATIONS = {
 	{ name = "Spawn",     pos = Vector3.new(0,   5,   0)   },
@@ -142,18 +143,15 @@ logoFix2.Size = UDim2.new(1, 0, 0, 10); logoFix2.Position = UDim2.new(0, 0, 1, -
 logoFix2.BackgroundColor3 = C.sidebar; logoFix2.BorderSizePixel = 0
 
 -- ── Rainbow outline title ─────────────────────────────────────
--- "Ghxst" on top line — white text with animated rainbow UIStroke outline
--- "Menu"  below      — bubble/bold white text, no outline
 local GHXST_STR    = "Ghxst"
-local LETTER_W     = 18   -- px per character slot for "Ghxst"
+local LETTER_W     = 18
 local TITLE_START_X = 8
-local ghxstLetters = {}   -- main white labels
-local ghxstStrokes = {}   -- UIStroke per letter (rainbow outline)
+local ghxstLetters = {}
+local ghxstStrokes = {}
 
 for i = 1, #GHXST_STR do
 	local ch = GHXST_STR:sub(i, i)
 
-	-- White letter (foreground)
 	local lbl = Instance.new("TextLabel")
 	lbl.Size                   = UDim2.new(0, LETTER_W, 0, 30)
 	lbl.Position               = UDim2.new(0, TITLE_START_X + (i - 1) * LETTER_W, 0, 4)
@@ -166,7 +164,6 @@ for i = 1, #GHXST_STR do
 	lbl.ZIndex                 = 5
 	lbl.Parent                 = logoBar
 
-	-- Rainbow UIStroke outline on each letter
 	local stroke = Instance.new("UIStroke", lbl)
 	stroke.Color     = Color3.fromRGB(255, 0, 0)
 	stroke.Thickness = 2
@@ -176,20 +173,19 @@ for i = 1, #GHXST_STR do
 	ghxstStrokes[i] = stroke
 end
 
--- "Menu" below in bubble writing (large bold, white, no outline)
+-- "Menu" below in bubble writing
 local menuLabel = Instance.new("TextLabel")
 menuLabel.Size                   = UDim2.new(1, -8, 0, 20)
 menuLabel.Position               = UDim2.new(0, TITLE_START_X, 0, 34)
 menuLabel.BackgroundTransparency = 1
 menuLabel.Text                   = "Menu"
 menuLabel.TextColor3             = Color3.fromRGB(230, 230, 230)
-menuLabel.Font                   = Enum.Font.GothamBlack  -- bold bubble look
+menuLabel.Font                   = Enum.Font.GothamBlack
 menuLabel.TextSize               = 14
 menuLabel.TextXAlignment         = Enum.TextXAlignment.Left
 menuLabel.ZIndex                 = 5
 menuLabel.Parent                 = logoBar
 
--- Subtle drop-shadow copy behind "Menu" for bubble depth
 local menuShadow = Instance.new("TextLabel")
 menuShadow.Size                   = UDim2.new(1, -8, 0, 20)
 menuShadow.Position               = UDim2.new(0, TITLE_START_X + 1, 0, 36)
@@ -203,10 +199,10 @@ menuShadow.TextXAlignment         = Enum.TextXAlignment.Left
 menuShadow.ZIndex                 = 4
 menuShadow.Parent                 = logoBar
 
--- Rainbow cycle — animates the UIStroke outline colour on each "Ghxst" letter
+-- Rainbow cycle
 local rainbowTime = 0
 RunService.Heartbeat:Connect(function(dt)
-	rainbowTime = rainbowTime + dt * 0.7  -- outline rainbow speed
+	rainbowTime = rainbowTime + dt * 0.7
 	for i, stroke in ipairs(ghxstStrokes) do
 		local hue = (rainbowTime + (i - 1) * 0.15) % 1
 		stroke.Color = Color3.fromHSV(hue, 1, 1)
@@ -222,17 +218,14 @@ sidebar.BackgroundColor3 = C.sidebar
 sidebar.BorderSizePixel  = 0
 sidebar.Parent           = win
 Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 10)
--- square off right corners
 local sbFix = Instance.new("Frame", sidebar)
 sbFix.Size = UDim2.new(0, 10, 1, 0); sbFix.Position = UDim2.new(1, -10, 0, 0)
 sbFix.BackgroundColor3 = C.sidebar; sbFix.BorderSizePixel = 0
 
--- Sidebar divider line on right
 local sbLine = Instance.new("Frame", sidebar)
 sbLine.Size = UDim2.new(0, 1, 1, 0); sbLine.Position = UDim2.new(1, -1, 0, 0)
 sbLine.BackgroundColor3 = C.divider; sbLine.BorderSizePixel = 0
 
--- Nav list inside sidebar (below logo area)
 local navList = Instance.new("Frame")
 navList.Size             = UDim2.new(1, 0, 1, -60)
 navList.Position         = UDim2.new(0, 0, 0, 60)
@@ -263,7 +256,6 @@ local caFix = Instance.new("Frame", contentArea)
 caFix.Size = UDim2.new(0, 10, 1, 0); caFix.Position = UDim2.new(0, 0, 0, 0)
 caFix.BackgroundColor3 = C.content; caFix.BorderSizePixel = 0
 
--- Draggable title strip across content top
 local titleStrip = Instance.new("Frame")
 titleStrip.Size             = UDim2.new(1, 0, 0, 40)
 titleStrip.BackgroundTransparency = 1
@@ -271,7 +263,6 @@ titleStrip.BorderSizePixel  = 0
 titleStrip.ZIndex           = 5
 titleStrip.Parent           = contentArea
 
--- Close + min buttons
 local function makeWinBtn(xOff, col)
 	local b = Instance.new("TextButton")
 	b.Size = UDim2.new(0, 12, 0, 12)
@@ -286,7 +277,6 @@ end
 local closeBtn = makeWinBtn(-20, C.red)
 local minBtn   = makeWinBtn(-38, C.goldDark)
 
--- Page title label
 local pageTitle = Instance.new("TextLabel")
 pageTitle.Size                   = UDim2.new(1, -60, 0, 40)
 pageTitle.Position               = UDim2.new(0, 16, 0, 0)
@@ -299,7 +289,6 @@ pageTitle.TextXAlignment         = Enum.TextXAlignment.Left
 pageTitle.ZIndex                 = 6
 pageTitle.Parent                 = contentArea
 
--- Thin gold line under title
 local titleLine = Instance.new("Frame", contentArea)
 titleLine.Size = UDim2.new(1, 0, 0, 1)
 titleLine.Position = UDim2.new(0, 0, 0, 40)
@@ -344,7 +333,6 @@ local function switchTab(id)
 			if ico then ico.TextColor3 = C.muted end
 		end
 	end
-	-- update page title
 	for _, t in ipairs(TABS) do
 		if t.id == id then pageTitle.Text = t.label end
 	end
@@ -360,7 +348,6 @@ local function makeNavBtn(tabData)
 	btn.Parent                 = navList
 	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 7)
 
-	-- Gold left accent bar (shown when active)
 	local highlight = Instance.new("Frame", btn)
 	highlight.Name             = "Highlight"
 	highlight.Size             = UDim2.new(0, 3, 0, 18)
@@ -553,8 +540,9 @@ local function makeToggleBtn(parent, label, onToggle)
 	hitbox.BackgroundTransparency = 1
 	hitbox.Text = ""
 
-	hitbox.MouseButton1Click:Connect(function()
-		isOn = not isOn
+	-- Exposed so Q key can sync the toggle visually
+	local function setToggle(value)
+		isOn = value
 		local tw = TweenInfo.new(0.15, Enum.EasingStyle.Quad)
 		if isOn then
 			TweenService:Create(togBg, tw, { BackgroundColor3 = C.gold }):Play()
@@ -564,8 +552,14 @@ local function makeToggleBtn(parent, label, onToggle)
 			TweenService:Create(knob, tw, { Position = UDim2.new(0, 3, 0.5, -7) }):Play()
 		end
 		onToggle(isOn)
+	end
+
+	hitbox.MouseButton1Click:Connect(function()
+		setToggle(not isOn)
 	end)
-	return btn
+
+	-- Return setToggle so fly toggle UI can be synced from Q key
+	return btn, setToggle
 end
 
 local function makeSlider(parent, label, min, max, default, onChange)
@@ -669,7 +663,8 @@ local function notify(msg)
 		{ BackgroundTransparency = 1, TextTransparency = 1 })
 	toastTween:Play()
 	toastTween.Completed:Connect(function()
-		toast.TextTransparency = 0; toast.Text = ""
+		toast.Text = ""
+		toast.TextTransparency = 0
 	end)
 end
 
@@ -707,7 +702,7 @@ local function enableFly()
 		State.bodyVelocity.Velocity = dir * State.flySpeed
 		State.bodyGyro.CFrame = cam.CFrame
 	end)
-	notify("✈️  Fly ON")
+	notify("✈️  Fly ON  [Q to toggle]")
 end
 
 local function disableFly()
@@ -808,14 +803,21 @@ do
 end
 
 --- PLAYER ---
+-- We hold a reference to the fly setToggle so Q key can sync the UI
+local flySetToggle = nil
+
 do
 	local p = makePage("player")
 
 	makeSectionLabel(p, "MOVEMENT")
-	makeToggleBtn(p, "✈️  Fly Mode", function(on)
+
+	-- Fly toggle — capture setToggle for Q key sync
+	local _, flySync = makeToggleBtn(p, "✈️  Fly Mode  [Q]", function(on)
 		State.flyEnabled = on
 		if on then enableFly() else disableFly() end
 	end)
+	flySetToggle = flySync
+
 	makeToggleBtn(p, "👻  NoClip", function(on)
 		State.noclipEnabled = on
 		if on then enableNoclip() else disableNoclip() end
@@ -1029,6 +1031,9 @@ do
 	makeListBtn(p, "🔑  Change Toggle Key", "Currently: F9", function()
 		notify("🔑 Edit TOGGLE_KEY in script")
 	end)
+	makeListBtn(p, "✈️  Change Fly Key", "Currently: Q", function()
+		notify("✈️ Edit FLY_KEY in script")
+	end)
 	makeListBtn(p, "🆔  Show User ID", "Display your Roblox User ID", function()
 		notify("🆔 ID: " .. LocalPlayer.UserId)
 	end)
@@ -1054,7 +1059,7 @@ do
 	end
 	aLine("GHXST Menu  v2.0")
 	aLine("Black & Gold Admin Panel")
-	aLine("Toggle: F9")
+	aLine("Toggle: F9  |  Fly: Q")
 end
 
 -- ============================================================
@@ -1088,10 +1093,17 @@ end)
 closeBtn.MouseButton1Click:Connect(closeMenu)
 minBtn.MouseButton1Click:Connect(closeMenu)
 
+-- ── Keyboard input (F9 menu toggle + Q fly toggle) ────────────
 UserInputService.InputBegan:Connect(function(inp, proc)
 	if proc then return end
 	if inp.KeyCode == TOGGLE_KEY then
 		if State.menuOpen then closeMenu() else openMenu() end
+	end
+	if inp.KeyCode == FLY_KEY then
+		State.flyEnabled = not State.flyEnabled
+		if State.flyEnabled then enableFly() else disableFly() end
+		-- Sync the toggle UI in the Player tab
+		if flySetToggle then flySetToggle(State.flyEnabled) end
 	end
 end)
 
@@ -1130,3 +1142,4 @@ end)
 -- Init
 switchTab("home")
 print("[GhxstMenu v2] ✓ Loaded — " .. LocalPlayer.Name .. " (ID: " .. LocalPlayer.UserId .. ")")
+print("[GhxstMenu v2] ✈️  Press Q to toggle fly at any time")
