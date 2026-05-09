@@ -14,8 +14,8 @@ local RunService       = game:GetService("RunService")
 -- ============================================================
 
 local ADMIN_IDS = {
-	10920590462, -- ←  Ghxst
-	50282387, -- LJ7
+	10920590462, -- Your ID
+	50282387,    -- Your friend's ID
 }
 
 local TOGGLE_KEY = Enum.KeyCode.F9
@@ -32,95 +32,110 @@ local TELEPORT_LOCATIONS = {
 -- ============================================================
 
 local BIOMES = {
+	-- OVERWORLD BIOMES
 	{
-		name   = "🌲  Plains",
-		sub    = "Oak, Cherry Blossom, Elm",
-		pos    = Vector3.new(180, 5, -20),
-		woods  = { "Oak", "Cherry Blossom", "Elm" },
+		name  = "🌲  Plains / Spawn Forest",
+		sub   = "Oak, Elm, Cherry Blossom",
+		pos   = Vector3.new(214, 5, -25),
+		woods = { "Oak", "Elm", "Cherry Blossom" },
 	},
 	{
-		name   = "🍁  Taiga",
-		sub    = "Fir, Pine, Snowglow",
-		pos    = Vector3.new(-620, 5, -780),
-		woods  = { "Fir", "Pine", "Snowglow" },
+		name  = "🍁  Taiga",
+		sub   = "Fir, Pine, Snowglow",
+		pos   = Vector3.new(-555, 10, -750),
+		woods = { "Fir", "Pine", "Snowglow" },
 	},
 	{
-		name   = "🌴  Tropics",
-		sub    = "Palm, Mangrove, Volcano",
-		pos    = Vector3.new(1400, 5, -850),
-		woods  = { "Palm", "Mangrove", "Volcano" },
+		name  = "🌴  Tropics",
+		sub   = "Palm, Mangrove",
+		pos   = Vector3.new(1340, 5, -820),
+		woods = { "Palm", "Mangrove" },
 	},
 	{
-		name   = "🍄  Mushroom Biome",
-		sub    = "Mushroom, Frost, Spooky",
-		pos    = Vector3.new(385, 5, -1550),
-		woods  = { "Mushroom", "Frost", "Spooky" },
+		name  = "🍄  Mushroom Biome",
+		sub   = "Mushroom, Spooky",
+		pos   = Vector3.new(390, 5, -1570),
+		woods = { "Mushroom", "Spooky" },
 	},
 	{
-		name   = "⛰️  Mountains",
-		sub    = "Lava, Frost, Cavecrawler",
-		pos    = Vector3.new(-435, 55, -420),
-		woods  = { "Lava", "Frost", "Cavecrawler" },
+		name  = "🌊  Swamp",
+		sub   = "Swamp, Mangrove",
+		pos   = Vector3.new(-855, 4, 195),
+		woods = { "Swamp", "Mangrove" },
 	},
 	{
-		name   = "🌑  Volcano",
-		sub    = "Lava, Volcano, Charcoal",
-		pos    = Vector3.new(1335, 110, -1050),
-		woods  = { "Lava", "Volcano", "Charcoal" },
+		name  = "🌸  Elm / Cherry Forest",
+		sub   = "Elm, Cherry Blossom, Oak",
+		pos   = Vector3.new(358, 5, 275),
+		woods = { "Elm", "Cherry Blossom", "Oak" },
 	},
 	{
-		name   = "🌊  Swamp",
-		sub    = "Swamp, Mangrove, Pondwood",
-		pos    = Vector3.new(-820, 3, 220),
-		woods  = { "Swamp", "Mangrove", "Pondwood" },
+		name  = "🦚  Fantasy / Sinister",
+		sub   = "Phantasm, Sinister, Koa",
+		pos   = Vector3.new(555, 5, -1645),
+		woods = { "Phantasm", "Sinister", "Koa" },
+	},
+
+	-- MOUNTAIN / ELEVATED
+	{
+		name  = "⛰️  Mountain Ridge",
+		sub   = "Frost, Fir, Pine",
+		pos   = Vector3.new(-430, 80, -430),
+		woods = { "Frost", "Fir", "Pine" },
 	},
 	{
-		name   = "🏔️  Alpine",
-		sub    = "Snowglow, Frost, Fir",
-		pos    = Vector3.new(-450, 190, -730),
-		woods  = { "Snowglow", "Frost", "Fir" },
+		name  = "🏔️  Alpine / Snowglow Peak",
+		sub   = "Snowglow, Frost, Fir",
+		pos   = Vector3.new(-460, 220, -710),
+		woods = { "Snowglow", "Frost", "Fir" },
+	},
+
+	-- UNDERGROUND
+	{
+		name  = "🕳️  Cavern — Cavecrawler",
+		sub   = "Cavecrawler wood (underground cave)",
+		pos   = Vector3.new(-253, -28, -295),
+		woods = { "Cavecrawler" },
+	},
+
+	-- VOLCANO ISLAND
+	{
+		name  = "🌑  Volcano Island — Lava & Volcano",
+		sub   = "Volcano, Lava, Charred wood",
+		pos   = Vector3.new(1286, 22, -1060),
+		woods = { "Volcano", "Lava" },
 	},
 	{
-		name   = "🦚  Fantasy",
-		sub    = "Phantasm, Sinister, Koa",
-		pos    = Vector3.new(570, 5, -1680),
-		woods  = { "Phantasm", "Sinister", "Koa" },
+		name  = "🔥  Volcano Peak (Lava wood)",
+		sub   = "Lava wood near top of volcano",
+		pos   = Vector3.new(1300, 115, -1050),
+		woods = { "Lava" },
+	},
+
+	-- KEY LOCATIONS
+	{
+		name  = "🛒  Wood R Us Shop",
+		sub   = "Buy Gold, Frost, Lava, Phantom, Zombie",
+		pos   = Vector3.new(316, 5, -112),
+		woods = { "Gold", "Frost", "Lava", "Phantom", "Zombie" },
 	},
 	{
-		name   = "🕳️  Cavern",
-		sub    = "Cavecrawler, Spooky",
-		pos    = Vector3.new(-280, -60, -280),
-		woods  = { "Cavecrawler", "Spooky" },
+		name  = "💰  Wood Sell Dock",
+		sub   = "Sell your lumber here",
+		pos   = Vector3.new(322, 3, 48),
+		woods = {},
 	},
 	{
-		name   = "🌸  Elm Forest",
-		sub    = "Elm, Oak, Cherry Blossom",
-		pos    = Vector3.new(350, 5, 280),
-		woods  = { "Elm", "Oak", "Cherry Blossom" },
+		name  = "🏪  Tool Shop",
+		sub   = "Buy axes and tools",
+		pos   = Vector3.new(294, 5, -68),
+		woods = {},
 	},
 	{
-		name   = "🛒  Wood R Us Shop",
-		sub    = "Buy special wood types",
-		pos    = Vector3.new(316, 5, -115),
-		woods  = { "Gold", "Frost", "Lava", "Phantom", "Zombie" },
-	},
-	{
-		name   = "🪓  Lumber Yard / Spawn",
-		sub    = "Starting area, sell dock nearby",
-		pos    = Vector3.new(215, 5, -21),
-		woods  = { "Oak", "Elm" },
-	},
-	{
-		name   = "💰  Wood Sell Dock",
-		sub    = "Sell your lumber here",
-		pos    = Vector3.new(320, 3, 50),
-		woods  = {},
-	},
-	{
-		name   = "🏪  Tool Shop",
-		sub    = "Buy axes and tools",
-		pos    = Vector3.new(295, 5, -70),
-		woods  = {},
+		name  = "🪓  Lumber Yard / Spawn",
+		sub   = "Main spawn area",
+		pos   = Vector3.new(208, 5, -18),
+		woods = { "Oak", "Elm" },
 	},
 }
 
