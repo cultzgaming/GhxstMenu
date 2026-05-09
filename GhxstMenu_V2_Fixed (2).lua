@@ -15,7 +15,7 @@ local RunService       = game:GetService("RunService")
 
 local ADMIN_IDS = {
 	10920590462, -- Your ID
-	50282387,    -- Your friend's ID
+	10886500275,    -- Your friend's ID
 }
 
 local TOGGLE_KEY = Enum.KeyCode.F9
