@@ -14,7 +14,8 @@ local RunService       = game:GetService("RunService")
 -- ============================================================
 
 local ADMIN_IDS = {
-	10920590462,50282387 -- ← Replace with your actual Roblox User ID
+	10920590462, -- ←  Ghxst
+	50282387, -- LJ7
 }
 
 local TOGGLE_KEY = Enum.KeyCode.F9
