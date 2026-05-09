@@ -18,13 +18,109 @@ local ADMIN_IDS = {
 }
 
 local TOGGLE_KEY = Enum.KeyCode.F9
-local FLY_KEY    = Enum.KeyCode.Q  -- ← Press Q to toggle fly instantly
 
 local TELEPORT_LOCATIONS = {
 	{ name = "Spawn",     pos = Vector3.new(0,   5,   0)   },
 	{ name = "Sawmill",   pos = Vector3.new(100, 5,   0)   },
 	{ name = "Wood Shop", pos = Vector3.new(0,   5,   100) },
 	{ name = "Mountain",  pos = Vector3.new(-80, 60, -80)  },
+}
+
+-- ============================================================
+--  BIOME LOCATIONS  (exact LT2 coordinates)
+-- ============================================================
+
+local BIOMES = {
+	{
+		name   = "🌲  Plains",
+		sub    = "Oak, Cherry Blossom, Elm",
+		pos    = Vector3.new(180, 5, -20),
+		woods  = { "Oak", "Cherry Blossom", "Elm" },
+	},
+	{
+		name   = "🍁  Taiga",
+		sub    = "Fir, Pine, Snowglow",
+		pos    = Vector3.new(-620, 5, -780),
+		woods  = { "Fir", "Pine", "Snowglow" },
+	},
+	{
+		name   = "🌴  Tropics",
+		sub    = "Palm, Mangrove, Volcano",
+		pos    = Vector3.new(1400, 5, -850),
+		woods  = { "Palm", "Mangrove", "Volcano" },
+	},
+	{
+		name   = "🍄  Mushroom Biome",
+		sub    = "Mushroom, Frost, Spooky",
+		pos    = Vector3.new(385, 5, -1550),
+		woods  = { "Mushroom", "Frost", "Spooky" },
+	},
+	{
+		name   = "⛰️  Mountains",
+		sub    = "Lava, Frost, Cavecrawler",
+		pos    = Vector3.new(-435, 55, -420),
+		woods  = { "Lava", "Frost", "Cavecrawler" },
+	},
+	{
+		name   = "🌑  Volcano",
+		sub    = "Lava, Volcano, Charcoal",
+		pos    = Vector3.new(1335, 110, -1050),
+		woods  = { "Lava", "Volcano", "Charcoal" },
+	},
+	{
+		name   = "🌊  Swamp",
+		sub    = "Swamp, Mangrove, Pondwood",
+		pos    = Vector3.new(-820, 3, 220),
+		woods  = { "Swamp", "Mangrove", "Pondwood" },
+	},
+	{
+		name   = "🏔️  Alpine",
+		sub    = "Snowglow, Frost, Fir",
+		pos    = Vector3.new(-450, 190, -730),
+		woods  = { "Snowglow", "Frost", "Fir" },
+	},
+	{
+		name   = "🦚  Fantasy",
+		sub    = "Phantasm, Sinister, Koa",
+		pos    = Vector3.new(570, 5, -1680),
+		woods  = { "Phantasm", "Sinister", "Koa" },
+	},
+	{
+		name   = "🕳️  Cavern",
+		sub    = "Cavecrawler, Spooky",
+		pos    = Vector3.new(-280, -60, -280),
+		woods  = { "Cavecrawler", "Spooky" },
+	},
+	{
+		name   = "🌸  Elm Forest",
+		sub    = "Elm, Oak, Cherry Blossom",
+		pos    = Vector3.new(350, 5, 280),
+		woods  = { "Elm", "Oak", "Cherry Blossom" },
+	},
+	{
+		name   = "🛒  Wood R Us Shop",
+		sub    = "Buy special wood types",
+		pos    = Vector3.new(316, 5, -115),
+		woods  = { "Gold", "Frost", "Lava", "Phantom", "Zombie" },
+	},
+	{
+		name   = "🪓  Lumber Yard / Spawn",
+		sub    = "Starting area, sell dock nearby",
+		pos    = Vector3.new(215, 5, -21),
+		woods  = { "Oak", "Elm" },
+	},
+	{
+		name   = "💰  Wood Sell Dock",
+		sub    = "Sell your lumber here",
+		pos    = Vector3.new(320, 3, 50),
+		woods  = {},
+	},
+	{
+		name   = "🏪  Tool Shop",
+		sub    = "Buy axes and tools",
+		pos    = Vector3.new(295, 5, -70),
+		woods  = {},
+	},
 }
 
 -- ============================================================
@@ -73,15 +169,15 @@ local C = {
 	content    = Color3.fromRGB(18,  18,  18),
 	card       = Color3.fromRGB(24,  24,  24),
 	cardHover  = Color3.fromRGB(32,  32,  32),
-	gold       = Color3.fromRGB(90, 190, 255),
-	goldLight  = Color3.fromRGB(160, 220, 255),
-	goldDark   = Color3.fromRGB(40, 120, 180),
-	goldDim    = Color3.fromRGB(10, 30, 55),
-	goldFaint  = Color3.fromRGB(8, 18, 35),
+	gold       = Color3.fromRGB(212, 175, 55),
+	goldLight  = Color3.fromRGB(255, 215, 90),
+	goldDark   = Color3.fromRGB(130, 100, 20),
+	goldDim    = Color3.fromRGB(40,  32,  10),
+	goldFaint  = Color3.fromRGB(22,  18,  5),
 	white      = Color3.fromRGB(230, 230, 230),
-	muted      = Color3.fromRGB(80, 130, 170),
-	dim        = Color3.fromRGB(35, 65, 95),
-	divider    = Color3.fromRGB(20, 40, 65),
+	muted      = Color3.fromRGB(110, 100, 75),
+	dim        = Color3.fromRGB(55,  50,  38),
+	divider    = Color3.fromRGB(35,  30,  15),
 	red        = Color3.fromRGB(180, 50,  50),
 	green      = Color3.fromRGB(50,  160, 70),
 }
@@ -105,7 +201,7 @@ toggleBtn.BackgroundColor3 = C.sidebar
 toggleBtn.TextColor3       = C.gold
 toggleBtn.Font             = Enum.Font.GothamBold
 toggleBtn.TextSize         = 11
-toggleBtn.Text             = "  GHXST"
+toggleBtn.Text             = "👻  GHXST  [F9]"
 toggleBtn.BorderSizePixel  = 0
 toggleBtn.Parent           = gui
 Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 8)
@@ -125,7 +221,7 @@ Instance.new("UICorner", win).CornerRadius = UDim.new(0, 10)
 local winStroke = Instance.new("UIStroke", win)
 winStroke.Color = C.goldDark; winStroke.Thickness = 1
 
--- ── Logo bar (top of sidebar) ─────────────────────────────────
+-- ── Logo bar ─────────────────────────────────────────────────
 local logoBar = Instance.new("Frame")
 logoBar.Size             = UDim2.new(0, 150, 0, 60)
 logoBar.Position         = UDim2.new(0, 0, 0, 0)
@@ -134,7 +230,6 @@ logoBar.BorderSizePixel  = 0
 logoBar.ZIndex           = 3
 logoBar.Parent           = win
 Instance.new("UICorner", logoBar).CornerRadius = UDim.new(0, 10)
--- square off right + bottom corners
 local logoFix1 = Instance.new("Frame", logoBar)
 logoFix1.Size = UDim2.new(0, 10, 1, 0); logoFix1.Position = UDim2.new(1, -10, 0, 0)
 logoFix1.BackgroundColor3 = C.sidebar; logoFix1.BorderSizePixel = 0
@@ -142,16 +237,15 @@ local logoFix2 = Instance.new("Frame", logoBar)
 logoFix2.Size = UDim2.new(1, 0, 0, 10); logoFix2.Position = UDim2.new(0, 0, 1, -10)
 logoFix2.BackgroundColor3 = C.sidebar; logoFix2.BorderSizePixel = 0
 
--- ── Rainbow outline title ─────────────────────────────────────
-local GHXST_STR    = "GHXST"
-local LETTER_W     = 22
+-- Rainbow title letters
+local GHXST_STR    = "Ghxst"
+local LETTER_W     = 18
 local TITLE_START_X = 8
 local ghxstLetters = {}
 local ghxstStrokes = {}
 
 for i = 1, #GHXST_STR do
 	local ch = GHXST_STR:sub(i, i)
-
 	local lbl = Instance.new("TextLabel")
 	lbl.Size                   = UDim2.new(0, LETTER_W, 0, 30)
 	lbl.Position               = UDim2.new(0, TITLE_START_X + (i - 1) * LETTER_W, 0, 4)
@@ -163,22 +257,19 @@ for i = 1, #GHXST_STR do
 	lbl.TextXAlignment         = Enum.TextXAlignment.Center
 	lbl.ZIndex                 = 5
 	lbl.Parent                 = logoBar
-
 	local stroke = Instance.new("UIStroke", lbl)
 	stroke.Color     = Color3.fromRGB(255, 0, 0)
 	stroke.Thickness = 2
 	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
-
 	ghxstLetters[i] = lbl
 	ghxstStrokes[i] = stroke
 end
 
--- "Menu" below in bubble writing
 local menuLabel = Instance.new("TextLabel")
 menuLabel.Size                   = UDim2.new(1, -8, 0, 20)
 menuLabel.Position               = UDim2.new(0, TITLE_START_X, 0, 34)
 menuLabel.BackgroundTransparency = 1
-menuLabel.Text                   = ""
+menuLabel.Text                   = "Menu"
 menuLabel.TextColor3             = Color3.fromRGB(230, 230, 230)
 menuLabel.Font                   = Enum.Font.GothamBlack
 menuLabel.TextSize               = 14
@@ -199,7 +290,6 @@ menuShadow.TextXAlignment         = Enum.TextXAlignment.Left
 menuShadow.ZIndex                 = 4
 menuShadow.Parent                 = logoBar
 
--- Rainbow cycle
 local rainbowTime = 0
 RunService.Heartbeat:Connect(function(dt)
 	rainbowTime = rainbowTime + dt * 0.7
@@ -221,7 +311,6 @@ Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 10)
 local sbFix = Instance.new("Frame", sidebar)
 sbFix.Size = UDim2.new(0, 10, 1, 0); sbFix.Position = UDim2.new(1, -10, 0, 0)
 sbFix.BackgroundColor3 = C.sidebar; sbFix.BorderSizePixel = 0
-
 local sbLine = Instance.new("Frame", sidebar)
 sbLine.Size = UDim2.new(0, 1, 1, 0); sbLine.Position = UDim2.new(1, -1, 0, 0)
 sbLine.BackgroundColor3 = C.divider; sbLine.BorderSizePixel = 0
@@ -232,12 +321,10 @@ navList.Position         = UDim2.new(0, 0, 0, 60)
 navList.BackgroundTransparency = 1
 navList.BorderSizePixel  = 0
 navList.Parent           = sidebar
-
 local navLayout = Instance.new("UIListLayout", navList)
 navLayout.Padding = UDim.new(0, 2)
 navLayout.FillDirection = Enum.FillDirection.Vertical
 navLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
 local navPad = Instance.new("UIPadding", navList)
 navPad.PaddingTop = UDim.new(0, 8)
 navPad.PaddingLeft = UDim.new(0, 8)
@@ -305,6 +392,7 @@ local tabPages   = {}
 local TABS = {
 	{ id = "home",     icon = "🏠", label = "Home"      },
 	{ id = "player",   icon = "👤", label = "Player"    },
+	{ id = "biomes",   icon = "🌲", label = "Biomes"    },  -- NEW
 	{ id = "world",    icon = "🌍", label = "World"     },
 	{ id = "dupe",     icon = "📋", label = "Dupe"      },
 	{ id = "mod",      icon = "⚔️",  label = "Mod"       },
@@ -392,7 +480,6 @@ local function makeNavBtn(tabData)
 		end
 	end)
 	btn.MouseButton1Click:Connect(function() switchTab(tabData.id) end)
-
 	tabButtons[tabData.id] = btn
 end
 
@@ -540,9 +627,8 @@ local function makeToggleBtn(parent, label, onToggle)
 	hitbox.BackgroundTransparency = 1
 	hitbox.Text = ""
 
-	-- Exposed so Q key can sync the toggle visually
-	local function setToggle(value)
-		isOn = value
+	hitbox.MouseButton1Click:Connect(function()
+		isOn = not isOn
 		local tw = TweenInfo.new(0.15, Enum.EasingStyle.Quad)
 		if isOn then
 			TweenService:Create(togBg, tw, { BackgroundColor3 = C.gold }):Play()
@@ -552,14 +638,8 @@ local function makeToggleBtn(parent, label, onToggle)
 			TweenService:Create(knob, tw, { Position = UDim2.new(0, 3, 0.5, -7) }):Play()
 		end
 		onToggle(isOn)
-	end
-
-	hitbox.MouseButton1Click:Connect(function()
-		setToggle(not isOn)
 	end)
-
-	-- Return setToggle so fly toggle UI can be synced from Q key
-	return btn, setToggle
+	return btn
 end
 
 local function makeSlider(parent, label, min, max, default, onChange)
@@ -633,7 +713,7 @@ local function makeSlider(parent, label, min, max, default, onChange)
 	return frame
 end
 
--- ── Toast notification ────────────────────────────────────────
+-- ── Toast ─────────────────────────────────────────────────────
 local toast = Instance.new("TextLabel")
 toast.Size = UDim2.new(0, 260, 0, 28)
 toast.Position = UDim2.new(0.5, -130, 1, -38)
@@ -663,8 +743,7 @@ local function notify(msg)
 		{ BackgroundTransparency = 1, TextTransparency = 1 })
 	toastTween:Play()
 	toastTween.Completed:Connect(function()
-		toast.Text = ""
-		toast.TextTransparency = 0
+		toast.TextTransparency = 0; toast.Text = ""
 	end)
 end
 
@@ -678,56 +757,37 @@ local function enableFly()
 	local hrp = char:FindFirstChild("HumanoidRootPart")
 	local hum = char:FindFirstChildOfClass("Humanoid")
 	if not hrp or not hum then return end
-
-	if State.bodyVelocity then State.bodyVelocity:Destroy() end
-	if State.bodyGyro     then State.bodyGyro:Destroy()     end
-	if State.flyConn      then State.flyConn:Disconnect()   end
-
-	State.bodyVelocity            = Instance.new("BodyVelocity")
-	State.bodyVelocity.Velocity   = Vector3.zero
-	State.bodyVelocity.MaxForce   = Vector3.new(1e5, 1e5, 1e5)
-	State.bodyVelocity.Parent     = hrp
-
-	State.bodyGyro                = Instance.new("BodyGyro")
-	State.bodyGyro.MaxTorque      = Vector3.new(1e5, 1e5, 1e5)
-	State.bodyGyro.D              = 100
-	State.bodyGyro.CFrame         = hrp.CFrame
-	State.bodyGyro.Parent         = hrp
-
+	hum.PlatformStand = true
+	State.bodyVelocity = Instance.new("BodyVelocity")
+	State.bodyVelocity.Velocity = Vector3.zero
+	State.bodyVelocity.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+	State.bodyVelocity.Parent = hrp
+	State.bodyGyro = Instance.new("BodyGyro")
+	State.bodyGyro.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+	State.bodyGyro.D = 100
+	State.bodyGyro.CFrame = hrp.CFrame
+	State.bodyGyro.Parent = hrp
 	State.flyConn = RunService.Heartbeat:Connect(function()
 		if not State.flyEnabled then return end
-		local char2 = LocalPlayer.Character
-		if not char2 then return end
-		local hrp2 = char2:FindFirstChild("HumanoidRootPart")
-		local hum2 = char2:FindFirstChildOfClass("Humanoid")
-		if not hrp2 or not hum2 then return end
-
-		-- Prevent gravity pulling the character down while flying
-		hum2:ChangeState(Enum.HumanoidStateType.Physics)
-
 		local cam = workspace.CurrentCamera
 		local dir = Vector3.zero
-		if UserInputService:IsKeyDown(Enum.KeyCode.W)         then dir += cam.CFrame.LookVector  end
-		if UserInputService:IsKeyDown(Enum.KeyCode.S)         then dir -= cam.CFrame.LookVector  end
-		if UserInputService:IsKeyDown(Enum.KeyCode.A)         then dir -= cam.CFrame.RightVector end
-		if UserInputService:IsKeyDown(Enum.KeyCode.D)         then dir += cam.CFrame.RightVector end
-		if UserInputService:IsKeyDown(Enum.KeyCode.Space)     then dir += Vector3.yAxis          end
-		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir -= Vector3.yAxis          end
+		if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir += cam.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir -= cam.CFrame.LookVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir -= cam.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir += cam.CFrame.RightVector end
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space)     then dir += Vector3.yAxis end
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir -= Vector3.yAxis end
 		if dir.Magnitude > 0 then dir = dir.Unit end
 		State.bodyVelocity.Velocity = dir * State.flySpeed
-		State.bodyGyro.CFrame       = cam.CFrame
+		State.bodyGyro.CFrame = cam.CFrame
 	end)
-	notify("✈️  Fly ON  [Q to toggle]")
+	notify("✈️  Fly ON")
 end
 
 local function disableFly()
 	local char = LocalPlayer.Character
-	local hum  = char and char:FindFirstChildOfClass("Humanoid")
-	if hum then
-		hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-		hum.WalkSpeed = State.walkSpeed
-		hum.JumpPower = 50
-	end
+	local hum = char and char:FindFirstChildOfClass("Humanoid")
+	if hum then hum.PlatformStand = false end
 	if State.flyConn      then State.flyConn:Disconnect();   State.flyConn      = nil end
 	if State.bodyVelocity then State.bodyVelocity:Destroy(); State.bodyVelocity = nil end
 	if State.bodyGyro     then State.bodyGyro:Destroy();     State.bodyGyro     = nil end
@@ -817,26 +877,19 @@ do
 		l.TextXAlignment = Enum.TextXAlignment.Left
 	end
 	credLine("Made by:  GHXST")
-	credLine("Version:  2.0")
+	credLine("Version:  2.1")
 	credLine("Key:  GHXST_ADMIN")
 end
 
 --- PLAYER ---
--- We hold a reference to the fly setToggle so Q key can sync the UI
-local flySetToggle = nil
-
 do
 	local p = makePage("player")
 
 	makeSectionLabel(p, "MOVEMENT")
-
-	-- Fly toggle — capture setToggle for Q key sync
-	local _, flySync = makeToggleBtn(p, "✈️  Fly Mode  [Q]", function(on)
+	makeToggleBtn(p, "✈️  Fly Mode", function(on)
 		State.flyEnabled = on
 		if on then enableFly() else disableFly() end
 	end)
-	flySetToggle = flySync
-
 	makeToggleBtn(p, "👻  NoClip", function(on)
 		State.noclipEnabled = on
 		if on then enableNoclip() else disableNoclip() end
@@ -859,7 +912,7 @@ do
 		notify("Fly speed → " .. val)
 	end)
 
-	makeSectionLabel(p, "TELEPORT")
+	makeSectionLabel(p, "QUICK TELEPORT")
 	for _, loc in ipairs(TELEPORT_LOCATIONS) do
 		makeListBtn(p, "📍  " .. loc.name, "Teleport to " .. loc.name, function()
 			local char = LocalPlayer.Character
@@ -867,6 +920,235 @@ do
 			if hrp then hrp.CFrame = CFrame.new(loc.pos); notify("📍 → " .. loc.name) end
 		end)
 	end
+end
+
+-- ============================================================
+--  🌲  BIOMES TAB  (new)
+-- ============================================================
+do
+	local p = makePage("biomes")
+
+	-- ── Helper: teleport the local character to a position ────
+	local function tpTo(pos, label)
+		local char = LocalPlayer.Character
+		local hrp  = char and char:FindFirstChild("HumanoidRootPart")
+		if hrp then
+			hrp.CFrame = CFrame.new(pos + Vector3.new(0, 3, 0))
+			notify("🌲 → " .. label)
+		else
+			notify("❌ No character found")
+		end
+	end
+
+	-- ── Info banner ───────────────────────────────────────────
+	local banner = Instance.new("Frame", p)
+	banner.Size             = UDim2.new(1, 0, 0, 38)
+	banner.BackgroundColor3 = C.goldDim
+	banner.BorderSizePixel  = 0
+	Instance.new("UICorner", banner).CornerRadius = UDim.new(0, 8)
+	local bannerStroke = Instance.new("UIStroke", banner)
+	bannerStroke.Color = C.goldDark; bannerStroke.Thickness = 1
+	local bannerLbl = Instance.new("TextLabel", banner)
+	bannerLbl.Size                   = UDim2.new(1, -16, 1, 0)
+	bannerLbl.Position               = UDim2.new(0, 8, 0, 0)
+	bannerLbl.BackgroundTransparency = 1
+	bannerLbl.Text                   = "🗺️  Exact LT2 biome coordinates — click to teleport"
+	bannerLbl.TextColor3             = C.gold
+	bannerLbl.Font                   = Enum.Font.Gotham
+	bannerLbl.TextSize               = 11
+	bannerLbl.TextXAlignment         = Enum.TextXAlignment.Left
+
+	-- ── All biome buttons ─────────────────────────────────────
+	makeSectionLabel(p, "BIOMES  &  LOCATIONS")
+
+	for _, biome in ipairs(BIOMES) do
+		-- Build sublabel: wood types or blank
+		local woodStr = #biome.woods > 0
+			and ("Woods: " .. table.concat(biome.woods, ", "))
+			or  "📍 Key location"
+
+		-- Card button
+		local card = Instance.new("TextButton")
+		card.Size             = UDim2.new(1, 0, 0, 58)
+		card.BackgroundColor3 = C.card
+		card.BorderSizePixel  = 0
+		card.Text             = ""
+		card.Parent           = p
+		Instance.new("UICorner", card).CornerRadius = UDim.new(0, 8)
+
+		-- Gold left accent stripe
+		local stripe = Instance.new("Frame", card)
+		stripe.Size             = UDim2.new(0, 3, 0, 34)
+		stripe.Position         = UDim2.new(0, 0, 0.5, -17)
+		stripe.BackgroundColor3 = C.gold
+		stripe.BorderSizePixel  = 0
+		Instance.new("UICorner", stripe).CornerRadius = UDim.new(1, 0)
+
+		-- Biome name
+		local nameL = Instance.new("TextLabel", card)
+		nameL.Size                   = UDim2.new(1, -80, 0, 22)
+		nameL.Position               = UDim2.new(0, 16, 0, 8)
+		nameL.BackgroundTransparency = 1
+		nameL.Text                   = biome.name
+		nameL.TextColor3             = C.white
+		nameL.Font                   = Enum.Font.GothamBold
+		nameL.TextSize               = 13
+		nameL.TextXAlignment         = Enum.TextXAlignment.Left
+
+		-- Wood types sublabel
+		local subL = Instance.new("TextLabel", card)
+		subL.Size                   = UDim2.new(1, -80, 0, 16)
+		subL.Position               = UDim2.new(0, 16, 0, 30)
+		subL.BackgroundTransparency = 1
+		subL.Text                   = woodStr
+		subL.TextColor3             = C.muted
+		subL.Font                   = Enum.Font.Gotham
+		subL.TextSize               = 10
+		subL.TextXAlignment         = Enum.TextXAlignment.Left
+
+		-- Coordinates badge (top-right)
+		local coordL = Instance.new("TextLabel", card)
+		coordL.Size                   = UDim2.new(0, 90, 0, 14)
+		coordL.Position               = UDim2.new(1, -98, 0, 8)
+		coordL.BackgroundTransparency = 1
+		coordL.Text                   = string.format("(%d, %d, %d)",
+			biome.pos.X, biome.pos.Y, biome.pos.Z)
+		coordL.TextColor3             = C.goldDark
+		coordL.Font                   = Enum.Font.Gotham
+		coordL.TextSize               = 9
+		coordL.TextXAlignment         = Enum.TextXAlignment.Right
+
+		-- TP arrow
+		local arrow = Instance.new("TextLabel", card)
+		arrow.Size                   = UDim2.new(0, 20, 1, 0)
+		arrow.Position               = UDim2.new(1, -24, 0, 0)
+		arrow.BackgroundTransparency = 1
+		arrow.Text                   = "›"
+		arrow.TextColor3             = C.dim
+		arrow.Font                   = Enum.Font.GothamBold
+		arrow.TextSize               = 20
+
+		-- Hover / click effects
+		card.MouseEnter:Connect(function()
+			TweenService:Create(card, TweenInfo.new(0.1), { BackgroundColor3 = C.cardHover }):Play()
+			TweenService:Create(arrow, TweenInfo.new(0.1), { TextColor3 = C.gold }):Play()
+			TweenService:Create(stripe, TweenInfo.new(0.1), { BackgroundColor3 = C.goldLight }):Play()
+		end)
+		card.MouseLeave:Connect(function()
+			TweenService:Create(card, TweenInfo.new(0.1), { BackgroundColor3 = C.card }):Play()
+			TweenService:Create(arrow, TweenInfo.new(0.1), { TextColor3 = C.dim }):Play()
+			TweenService:Create(stripe, TweenInfo.new(0.1), { BackgroundColor3 = C.gold }):Play()
+		end)
+		card.MouseButton1Click:Connect(function()
+			TweenService:Create(card, TweenInfo.new(0.07), { BackgroundColor3 = C.goldDim }):Play()
+			task.delay(0.15, function()
+				TweenService:Create(card, TweenInfo.new(0.1), { BackgroundColor3 = C.card }):Play()
+			end)
+			tpTo(biome.pos, biome.name)
+		end)
+	end
+
+	-- ── Custom coordinate teleport ────────────────────────────
+	makeSectionLabel(p, "CUSTOM COORDS")
+
+	local customCard = Instance.new("Frame", p)
+	customCard.Size             = UDim2.new(1, 0, 0, 80)
+	customCard.BackgroundColor3 = C.card
+	customCard.BorderSizePixel  = 0
+	Instance.new("UICorner", customCard).CornerRadius = UDim.new(0, 8)
+
+	local cPad = Instance.new("UIPadding", customCard)
+	cPad.PaddingLeft = UDim.new(0, 10); cPad.PaddingRight = UDim.new(0, 10)
+	cPad.PaddingTop  = UDim.new(0, 8)
+
+	local cTitle = Instance.new("TextLabel", customCard)
+	cTitle.Size                   = UDim2.new(1, 0, 0, 14)
+	cTitle.BackgroundTransparency = 1
+	cTitle.Text                   = "Manual teleport  (X, Y, Z)"
+	cTitle.TextColor3             = C.muted
+	cTitle.Font                   = Enum.Font.Gotham
+	cTitle.TextSize               = 10
+	cTitle.TextXAlignment         = Enum.TextXAlignment.Left
+
+	-- Three mini text boxes side by side
+	local boxData = { {lbl="X", hint="-200"}, {lbl="Y", hint="5"}, {lbl="Z", hint="-800"} }
+	local boxes   = {}
+	local boxW    = 0.28
+
+	for i, bd in ipairs(boxData) do
+		local xPos = (i - 1) * 0.34
+
+		local boxLbl = Instance.new("TextLabel", customCard)
+		boxLbl.Size                   = UDim2.new(0, 12, 0, 18)
+		boxLbl.Position               = UDim2.new(xPos, 0, 0, 20)
+		boxLbl.BackgroundTransparency = 1
+		boxLbl.Text                   = bd.lbl
+		boxLbl.TextColor3             = C.gold
+		boxLbl.Font                   = Enum.Font.GothamBold
+		boxLbl.TextSize               = 10
+		boxLbl.TextXAlignment         = Enum.TextXAlignment.Left
+
+		local box = Instance.new("TextBox", customCard)
+		box.Size                  = UDim2.new(boxW, 0, 0, 22)
+		box.Position              = UDim2.new(xPos + 0.05, 0, 0, 20)
+		box.BackgroundColor3      = C.bg
+		box.TextColor3            = C.white
+		box.PlaceholderText       = bd.hint
+		box.PlaceholderColor3     = C.dim
+		box.Font                  = Enum.Font.Gotham
+		box.TextSize              = 11
+		box.BorderSizePixel       = 0
+		box.Text                  = ""
+		box.ClearTextOnFocus      = false
+		Instance.new("UICorner", box).CornerRadius = UDim.new(0, 5)
+		local bStroke = Instance.new("UIStroke", box)
+		bStroke.Color = C.divider; bStroke.Thickness = 1
+		local bPad = Instance.new("UIPadding", box)
+		bPad.PaddingLeft = UDim.new(0, 6)
+
+		boxes[i] = box
+	end
+
+	-- GO button
+	local goBtn = Instance.new("TextButton", customCard)
+	goBtn.Size             = UDim2.new(0, 42, 0, 22)
+	goBtn.Position         = UDim2.new(1, -42, 0, 20)
+	goBtn.BackgroundColor3 = C.gold
+	goBtn.TextColor3       = C.bg
+	goBtn.Font             = Enum.Font.GothamBold
+	goBtn.TextSize         = 11
+	goBtn.Text             = "GO"
+	goBtn.BorderSizePixel  = 0
+	Instance.new("UICorner", goBtn).CornerRadius = UDim.new(0, 5)
+
+	goBtn.MouseButton1Click:Connect(function()
+		local x = tonumber(boxes[1].Text)
+		local y = tonumber(boxes[2].Text)
+		local z = tonumber(boxes[3].Text)
+		if x and y and z then
+			tpTo(Vector3.new(x, y, z), string.format("(%d,%d,%d)", x, y, z))
+		else
+			notify("⚠️  Enter valid X, Y, Z numbers")
+		end
+	end)
+
+	goBtn.MouseEnter:Connect(function()
+		TweenService:Create(goBtn, TweenInfo.new(0.1), { BackgroundColor3 = C.goldLight }):Play()
+	end)
+	goBtn.MouseLeave:Connect(function()
+		TweenService:Create(goBtn, TweenInfo.new(0.1), { BackgroundColor3 = C.gold }):Play()
+	end)
+
+	-- Tip label below boxes
+	local tipL = Instance.new("TextLabel", customCard)
+	tipL.Size                   = UDim2.new(1, -10, 0, 14)
+	tipL.Position               = UDim2.new(0, 0, 0, 56)
+	tipL.BackgroundTransparency = 1
+	tipL.Text                   = "Tip: use Fly Mode before teleporting underground"
+	tipL.TextColor3             = C.dim
+	tipL.Font                   = Enum.Font.Gotham
+	tipL.TextSize               = 9
+	tipL.TextXAlignment         = Enum.TextXAlignment.Left
 end
 
 --- WORLD ---
@@ -908,11 +1190,10 @@ do
 	local p = makePage("dupe")
 
 	makeSectionLabel(p, "WOOD")
-	makeListBtn(p, "🪵  Dupe Nearby Wood", "Duplicates & saves wood within 20 studs", function()
+	makeListBtn(p, "🪵  Dupe Nearby Wood", "Duplicates wood within 20 studs", function()
 		local char = LocalPlayer.Character
 		local hrp = char and char:FindFirstChild("HumanoidRootPart")
 		if not hrp then notify("❌ No character"); return end
-		local woodList = {}
 		local duped = 0
 		for _, obj in ipairs(workspace:GetDescendants()) do
 			local n = obj.Name:lower()
@@ -921,27 +1202,11 @@ do
 					local clone = obj:Clone()
 					clone.Parent = workspace
 					clone.CFrame = obj.CFrame * CFrame.new(2, 0, 0)
-					table.insert(woodList, { name = clone.Name, cf = clone.CFrame })
 					duped += 1
 				end
 			end
 		end
-		local saveEvent = game:GetService("ReplicatedStorage"):FindFirstChild("SaveDupedWood")
-		if saveEvent and duped > 0 then
-			saveEvent:FireServer(woodList)
-			notify("📋 Duped & saved " .. duped .. " piece(s)")
-		else
-			notify("📋 Duped " .. duped .. " piece(s)")
-		end
-	end)
-	makeListBtn(p, "🔄  Load Saved Wood", "Spawns your previously saved wood", function()
-		local loadEvent = game:GetService("ReplicatedStorage"):FindFirstChild("LoadDupedWood")
-		if loadEvent then
-			loadEvent:FireServer()
-			notify("🔄 Loading saved wood...")
-		else
-			notify("❌ Server script not found!")
-		end
+		notify("📋 Duped " .. duped .. " piece(s)")
 	end)
 	makeListBtn(p, "📥  Pull Wood To Me", "Teleports nearby wood to you", function()
 		local char = LocalPlayer.Character
@@ -951,24 +1216,25 @@ do
 		for _, obj in ipairs(workspace:GetDescendants()) do
 			local n = obj.Name:lower()
 			if obj:IsA("BasePart") and (n:find("log") or n:find("wood") or n:find("lumber")) then
-				if (obj.Position - hrp.Position).Magnitude < 60 then
-					obj.CFrame = hrp.CFrame + Vector3.new(math.random(-6,6), 2, math.random(-6,6))
-					count += 1
-				end
+				obj.CFrame = hrp.CFrame + Vector3.new(math.random(-6,6), 2, math.random(-6,6))
+				count += 1
 			end
 		end
 		notify("🪵 Pulled " .. count .. " piece(s)")
 	end)
-	makeListBtn(p, "🗑️  Clear Duped Wood", "Removes cloned objects & clears save", function()
+	makeListBtn(p, "🗑️  Clear Duped Wood", "Removes cloned wood objects", function()
 		local removed = 0
 		for _, obj in ipairs(workspace:GetDescendants()) do
-			if obj:IsA("BasePart") and obj.Name:lower():find("clone") then
+			-- Match by clone tag OR by wood name ending in "(Clone)"
+			local n = obj.Name:lower()
+			if obj:IsA("BasePart") and (
+				n:find("%(clone%)") or
+				(n:find("log") or n:find("wood") or n:find("lumber")) and obj:GetAttribute("Duped")
+			) then
 				obj:Destroy(); removed += 1
 			end
 		end
-		local clearEvent = game:GetService("ReplicatedStorage"):FindFirstChild("ClearDupedWood")
-		if clearEvent then clearEvent:FireServer() end
-		notify("🗑️ Cleared " .. removed .. " dupe(s) & wiped save")
+		notify("🗑️ Cleared " .. removed .. " dupe(s)")
 	end)
 
 	makeSectionLabel(p, "ITEMS")
@@ -1071,9 +1337,6 @@ do
 	makeListBtn(p, "🔑  Change Toggle Key", "Currently: F9", function()
 		notify("🔑 Edit TOGGLE_KEY in script")
 	end)
-	makeListBtn(p, "✈️  Change Fly Key", "Currently: Q", function()
-		notify("✈️ Edit FLY_KEY in script")
-	end)
 	makeListBtn(p, "🆔  Show User ID", "Display your Roblox User ID", function()
 		notify("🆔 ID: " .. LocalPlayer.UserId)
 	end)
@@ -1097,9 +1360,9 @@ do
 		l.TextColor3 = C.muted; l.Font = Enum.Font.Gotham
 		l.TextSize = 11; l.TextXAlignment = Enum.TextXAlignment.Left
 	end
-	aLine("GHXST Menu  v2.0")
-	aLine("Light Blue Admin Panel")
-	aLine("Toggle: F9  |  Fly: Q")
+	aLine("GHXST Menu  v2.1")
+	aLine("Black & Gold Admin Panel")
+	aLine("Toggle: F9")
 end
 
 -- ============================================================
@@ -1133,21 +1396,14 @@ end)
 closeBtn.MouseButton1Click:Connect(closeMenu)
 minBtn.MouseButton1Click:Connect(closeMenu)
 
--- ── Keyboard input (F9 menu toggle + Q fly toggle) ────────────
 UserInputService.InputBegan:Connect(function(inp, proc)
 	if proc then return end
 	if inp.KeyCode == TOGGLE_KEY then
 		if State.menuOpen then closeMenu() else openMenu() end
 	end
-	if inp.KeyCode == FLY_KEY then
-		State.flyEnabled = not State.flyEnabled
-		if State.flyEnabled then enableFly() else disableFly() end
-		-- Sync the toggle UI in the Player tab
-		if flySetToggle then flySetToggle(State.flyEnabled) end
-	end
 end)
 
--- ── Draggable via logo bar ────────────────────────────────────
+-- ── Draggable ─────────────────────────────────────────────────
 local dragging, dragStart, winStart
 logoBar.InputBegan:Connect(function(inp)
 	if inp.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -1181,5 +1437,4 @@ end)
 
 -- Init
 switchTab("home")
-print("[GhxstMenu v2] ✓ Loaded — " .. LocalPlayer.Name .. " (ID: " .. LocalPlayer.UserId .. ")")
-print("[GhxstMenu v2] ✈️  Press Q to toggle fly at any time")
+print("[GhxstMenu v2.1] ✓ Loaded — " .. LocalPlayer.Name .. " (ID: " .. LocalPlayer.UserId .. ")")
